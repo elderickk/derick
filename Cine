@@ -1,0 +1,24 @@
+public class Cine {
+    private Sala xmen = new Sala("Xmen");
+    private Sala batman = new Sala("Batman");
+    private Sala mario = new Sala("Mario");
+
+    public boolean comprarEntradas(String salaNombre, Compra compra) {
+        Sala sala = switch (salaNombre) {
+            case "Xmen" -> xmen;
+            case "Batman" -> batman;
+            case "Mario" -> mario;
+            default -> null;
+        };
+        return sala != null && sala.agregarCompra(compra);
+    }
+
+    public Sala getSala(String nombre) {
+        return switch (nombre) {
+            case "Xmen" -> xmen;
+            case "Batman" -> batman;
+            case "Mario" -> mario;
+            default -> null;
+        };
+    }
+}
