@@ -1,0 +1,23 @@
+import java.util.Stack;
+
+public class Sala {
+    private String nombre;
+    private int capacidad = 22;
+    private Stack<Compra> ventas = new Stack<>();
+
+    public Sala(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public boolean agregarCompra(Compra compra) {
+        if (ventas.stream().mapToInt(Compra::getCantidadEntradas).sum() + compra.getCantidadEntradas() > capacidad) {
+            return false;
+        }
+        ventas.push(compra);
+        return true;
+    }
+
+    public int getDisponibles() {
+        return capacidad - ventas.stream().mapToInt(Compra::getCantidadEntradas).sum();
+    }
+}
