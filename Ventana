@@ -1,0 +1,149 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class Ventana {
+    private JPanel principal;
+    private JComboBox<String> cboPelicula;
+    private JTextField txtNombre;
+    private JTextField txtCantidad1;
+    private JTextField txtCantidad2;
+    private JTextField txtCantidad3;
+    private JButton btnComprar;
+    private JLabel Batman;
+    private JTextArea txtAreaCompras;
+    private Cine cine = new Cine();
+
+    public Ventana() {
+        // Configuración inicial
+        principal = new JPanel(new BorderLayout(10, 10));
+
+        // Panel superior
+        JPanel panelSuperior = new JPanel(new FlowLayout());
+        cboPelicula = new JComboBox<>(new String[]{"Xmen", "Batman", "Mario"});
+        panelSuperior.add(new JLabel("Película:"));
+        panelSuperior.add(cboPelicula);
+        principal.add(panelSuperior, BorderLayout.NORTH);
+
+        // Panel central
+        JPanel panelCentral = new JPanel(new GridLayout(4, 2, 5, 5));
+        txtNombre = new JTextField();
+        txtCantidad1 = new JTextField();
+        txtCantidad2 = new JTextField();
+        txtCantidad3 = new JTextField();
+
+        panelCentral.add(new JLabel("Nombre:"));
+        panelCentral.add(txtNombre);
+        panelCentral.add(new JLabel("Cantidad Xmen:"));
+        panelCentral.add(txtCantidad1);
+        panelCentral.add(new JLabel("Cantidad Batman:"));
+        panelCentral.add(txtCantidad2);
+        panelCentral.add(new JLabel("Cantidad Mario:"));
+        panelCentral.add(txtCantidad3);
+
+        principal.add(panelCentral, BorderLayout.CENTER);
+
+        // Panel inferior
+        JPanel panelInferior = new JPanel(new BorderLayout());
+        btnComprar = new JButton("Comprar");
+        txtAreaCompras = new JTextArea(10, 30);
+        txtAreaCompras.setEditable(false);
+
+        panelInferior.add(btnComprar, BorderLayout.NORTH);
+        panelInferior.add(new JScrollPane(txtAreaCompras), BorderLayout.CENTER);
+        principal.add(panelInferior, BorderLayout.SOUTH);
+
+        // Acción del botón
+        btnComprar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String pelicula = (String) cboPelicula.getSelectedItem();
+                String nombre = txtNombre.getText().trim();
+
+                try {
+                    // Validación de campos vacíos
+                    if (nombre.isEmpty()) {
+                        JOptionPane.showMessageDialog(principal, "Ingrese su nombre");
+                        return;
+                    }
+
+                    int cantidad = 0;
+                    boolean camposIncorrectos = false;
+
+                    // Validación por película seleccionada
+                    switch (pelicula) {
+                        case "Xmen":
+                            cantidad = validarCantidad(txtCantidad1.getText().trim());
+                            if (!txtCantidad2.getText().isEmpty() || !txtCantidad3.getText().isEmpty()) {
+                                camposIncorrectos = true;
+                            }
+                            break;
+                        case "Batman":
+                            cantidad = validarCantidad(txtCantidad2.getText().trim());
+                            if (!txtCantidad1.getText().isEmpty() || !txtCantidad3.getText().isEmpty()) {
+                                camposIncorrectos = true;
+                            }
+                            break;
+                        case "Mario":
+                            cantidad = validarCantidad(txtCantidad3.getText().trim());
+                            if (!txtCantidad1.getText().isEmpty() || !txtCantidad2.getText().isEmpty()) {
+                                camposIncorrectos = true;
+                            }
+                            break;
+                    }
+
+                    if (camposIncorrectos) {
+                        JOptionPane.showMessageDialog(principal, "No seleccionó la película correcta");
+                        return;
+                    }
+
+                    if (cantidad < 1 || cantidad > 4) {
+                        JOptionPane.showMessageDialog(principal, "Solo se permiten entre 1 y 4 boletos");
+                        return;
+                    }
+
+                    // Procesar compra
+                    Compra compra = new Compra(nombre, cantidad);
+                    boolean exito = cine.comprarEntradas(pelicula, compra);
+
+                    if (exito) {
+                        txtAreaCompras.append(
+                                "Cliente: " + nombre +
+                                        " | Película: " + pelicula +
+                                        " | Boletos: " + cantidad +
+                                        " | Disponibles: " + cine.getSala(pelicula).getDisponibles() + "\n"
+                        );
+                        limpiarCampos();
+                    } else {
+                        JOptionPane.showMessageDialog(principal, "¡No hay suficientes asientos!");
+                    }
+
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(principal, "Ingrese una cantidad válida");
+                }
+            }
+        });
+    }
+
+    private int validarCantidad(String texto) throws NumberFormatException {
+        if (texto.isEmpty()) {
+            throw new NumberFormatException();
+        }
+        return Integer.parseInt(texto);
+    }
+
+    private void limpiarCampos() {
+        txtCantidad1.setText("");
+        txtCantidad2.setText("");
+        txtCantidad3.setText("");
+    }
+
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("Sistema de Cine");
+        frame.setContentPane(new Ventana().principal);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.pack();
+        frame.setVisible(true);
+    }
+}
