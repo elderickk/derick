@@ -1,0 +1,13 @@
+public class Compra {
+    private String nombreCliente;
+    private int cantidadEntradas;
+
+    public Compra(String nombreCliente, int cantidadEntradas) {
+        this.nombreCliente = nombreCliente;
+        this.cantidadEntradas = cantidadEntradas;
+    }
+
+    public int getCantidadEntradas() {
+        return cantidadEntradas;
+    }
+}
